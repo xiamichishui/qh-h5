@@ -1,0 +1,23 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["env.d.ts", "src/**/*", "vite-plugin/**/*", "typings/**/*","src/**/*.vue"],
+  "exclude": ["**/node_modules/**", "**/dist/**","src/**/__tests__/*"],
+
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "lib": ["dom", "es6"],
+    "types": ["vite/client"],
+    "typeRoots": ["./node_modules/@types/", "./src/typings/"]
+  }
+}

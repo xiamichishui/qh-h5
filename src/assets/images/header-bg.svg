@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="375px" height="178px" viewBox="0 0 375 178" version="1.1">
+    <title>黑</title>
+    <defs>
+        <linearGradient x1="119.633139%" y1="66.1073998%" x2="-118.598025%" y2="12.2251296%" id="linearGradient-1">
+            <stop stop-color="#31E5FF" offset="0%"/>
+            <stop stop-color="#25F776" offset="100%"/>
+        </linearGradient>
+        <path d="M0,0 L375,0 L375,164.142443 C287.722093,173.380814 221.88876,178 177.5,178 C133.11124,178 73.9445733,173.380814 0,164.142443 L0,0 Z" id="path-2"/>
+        
+        
+        
+        
+    </defs>
+    <g id="货币体系" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="矩形-+-矩形备份-9-+-矩形备份-8-蒙版">
+            <mask id="mask-3" fill="white">
+                <use xlink:href="#path-2"/>
+            </mask>
+            <use id="蒙版" fill="url(#linearGradient-1)" xlink:href="#path-2"/>
+            
+            
+            
+            
+        </g>
+    </g>
+</svg>

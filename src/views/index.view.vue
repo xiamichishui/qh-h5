@@ -89,12 +89,12 @@
   </van-config-provider>
 </template>
 <script setup lang="tsx">
-  import { type ConfigProviderThemeVars, showDialog, showToast } from 'vant';
+  import { type ConfigProviderThemeVars, showToast } from 'vant';
   import { http, http2 } from '@/util/http';
   import { catchError, debounceTime, map, of, Subject, switchMap } from 'rxjs';
 
   import { addPayOrder, ChannelEnum, getOrderInfo, type RechangeItem, type SysUser, TweetMark, TypeEnum } from './index.service';
-  import { type PayDialogResult, showPayDialog } from '@/components/pay-choose-dialog';
+  import { closePayDialog, showPayDialog } from '@/components/pay-choose-dialog';
   import { forwardWxPay } from '@/views/pay';
   import { globalLoading } from '@/hooks/use-loading';
   import { NumberUtil } from '@/util/utils';
@@ -156,7 +156,7 @@
     async onConfirmClick() {
       const amount = getAmount();
       if (amount) {
-        Pay.payDialogResult = showPayDialog({
+        showPayDialog({
           money: amount.amount,
           hamount: amount.tranHAmount,
           onOk(v) {
@@ -189,7 +189,6 @@
   const Pay = reactive({
     showPayConfirm: false,
     orderNo: '',
-    payDialogResult: null as any as PayDialogResult,
     // 支付类型 1:微信支付;2.支付宝支付
     async onOk(payType: 1 | 2) {
       if (!Recharge.user) {
@@ -236,7 +235,7 @@
       if (info.status === 2) {
         showToast('订单支付成功');
         Pay.showPayConfirm = false;
-        Pay.payDialogResult.close();
+        closePayDialog();
       } else {
         showToast('订单支付失败，如有疑问请联系客服');
       }

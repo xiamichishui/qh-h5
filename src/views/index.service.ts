@@ -5,6 +5,20 @@ export function addPayOrder(req: PayOrderReq) {
 }
 
 /**
+ * 查询订单状态
+ * @param orderNo 订单号
+ */
+export async function getOrderInfo(orderNo: string) {
+  const [order] = await http.post<OderInfoResp[]>('/order/page', {
+    page: {
+      pageIndex: 1,
+      pageSize: 1
+    }
+  });
+  return order;
+}
+
+/**
  * 订单管理请求参数 实体类
  */
 export interface PayOrderReq {
@@ -70,7 +84,7 @@ export interface PayOrderResp {
   /**
    * 订单编号
    */
-  orderNo?: string;
+  orderNo: string;
   /**
    * 购买的是否是会员 0:是;1:否
    */
@@ -83,6 +97,72 @@ export interface PayOrderResp {
    * 状态 1:未支付;2.已支付;3.支付关闭;4.支付失败
    */
   status?: number;
+  /**
+   * 更新时间
+   */
+  updateTime?: Date;
+  /**
+   * 用户id
+   */
+  userId?: number;
+  /**
+   * 用户名
+   */
+  username?: string;
+  /**
+   * 生效时间:已支付时的时间
+   */
+  vaildTime?: Date;
+}
+
+/**
+ * 订单管理返回数据 实体类
+ */
+export interface OderInfoResp {
+  /**
+   * 订单金额，单元是元
+   */
+  amount?: number;
+  /**
+   * 创建时间
+   */
+  createTime?: Date;
+  /**
+   * 描述
+   */
+  description?: string;
+  /**
+   * 主键id
+   */
+  id: number;
+  /**
+   * 会员配置id
+   */
+  numberConfigId?: number;
+  /**
+   * 会员配置名称
+   */
+  numberConfigName?: string;
+  /**
+   * 第三方支付下单后返回的订单信息
+   */
+  orderInfo?: string;
+  /**
+   * 订单编号
+   */
+  orderNo: string;
+  /**
+   * 购买的是否是会员 0:是;1:否
+   */
+  payNumber: 0 | 1;
+  /**
+   * 付类型 1:微信支付;2.支付宝支付
+   */
+  payType: number;
+  /**
+   * 状态 1:未支付;2.已支付;3.支付关闭;4.支付失败
+   */
+  status: 1 | 2 | 3 | 4;
   /**
    * 更新时间
    */

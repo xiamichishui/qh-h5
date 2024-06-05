@@ -2,13 +2,13 @@
   <div v-if="show" class="loading-box">
     <div class="mask"></div>
     <div class="loading-content-box">
-      <Loading :show="show" type="spinner" size="24" color="#1989fa" vertical>处理中...</Loading>
+      <Loading :show="show" type="spinner" size="30" vertical>处理中...</Loading>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { Loading } from 'vant';
+  import { ConfigProvider, Loading } from 'vant';
   const props = defineProps({
     show: Boolean
   });

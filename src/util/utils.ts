@@ -51,3 +51,16 @@ export function formatDate(srcDate: Date, fmt: string) {
   }
   return fmt;
 }
+
+/**
+ * 数字计算库,解决精度问题
+ */
+class NumberUtilClass {
+  constructor(public digit: number) {}
+
+  multiply(n: number, m: number) {
+    return (n * this.digit * m) / this.digit;
+  }
+}
+
+export const NumberUtil = new NumberUtilClass(10000);

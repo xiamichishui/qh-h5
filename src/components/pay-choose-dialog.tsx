@@ -34,6 +34,11 @@ export interface PayDialogOption {
   onCancel?: () => void;
 }
 
+export interface PayDialogResult {
+  close(): void;
+  instance: ComponentInstance;
+}
+
 const DEFAULT_OPTIONS = {
   teleport: 'body',
   position: 'bottom',
@@ -69,7 +74,7 @@ function initInstance() {
 /**
  * Display a message prompt dialog with a default confirm button
  */
-export function showPayDialog(options: PayDialogOption): { close(): void; instance: ComponentInstance } {
+export function showPayDialog(options: PayDialogOption): PayDialogResult {
   if (!instance) {
     initInstance();
   }

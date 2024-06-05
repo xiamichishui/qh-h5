@@ -31,7 +31,7 @@ export default defineConfig(env => {
     },
     build: {
       target: 'es2015',
-      outDir: 'dist/recharge-web',
+      outDir: 'dist/qh-h5',
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html')

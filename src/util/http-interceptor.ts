@@ -77,7 +77,7 @@ export function httpSetup() {
         } else if (err.status == 404) {
           $message('你访问的地址不存在, 请检查');
         } else {
-          $message('服务器发生错误, 请联系管理员');
+          $message('啊哦，网络出了点问题~');
         }
         throw err;
       })

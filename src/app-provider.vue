@@ -11,8 +11,12 @@
     name: 'AppProvider'
   });
 
+  const primaryColor = '#0AD16D';
   const themeVars: ConfigProviderThemeVars = {
-    primaryColor: '#0AD16D'
+    primaryColor,
+    dialogRadius: '3px',
+    loadingSpinnerColor: primaryColor,
+    loadingTextColor: primaryColor
   };
 
   const ContextHolder = defineComponent({

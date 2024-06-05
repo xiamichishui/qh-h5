@@ -31,7 +31,7 @@
           </van-cell-group>
         </van-radio-group>
 
-        <div class="text-center" style="color: #333; font-size: 16px; margin-top: 40px">
+        <div class="text-center" style="color: #333; font-size: 20px; margin-top: 40px">
           <span>￥</span>
           <span style="font-size: 40px; font-weight: 500">{{ props.money }}</span>
           <div v-if="props.hamount" class="hamount">{{ props.hamount }}mL氢气</div>
@@ -47,7 +47,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import type { OkFn, PayType, PayWay } from './pay-dialog';
+  import type { OkFn, PayType, PayWay } from './pay-choose-dialog';
 
   interface Props {
     titleText?: string;

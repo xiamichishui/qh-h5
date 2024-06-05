@@ -73,18 +73,31 @@
       </van-button>
     </div>
 
+    <van-dialog
+      v-model:show="Pay.showPayConfirm"
+      title="请确认微信支付是否完成"
+      :show-cancel-button="false"
+      :show-confirm-button="false"
+      class-name="pay-result-dialog"
+    >
+      <div class="pay-confirm-ok" @click="Pay.onPayOkClick">已完成支付</div>
+      <div class="pay-confirm-retry" @click="Pay.showPayConfirm = false">支付遇到问题，重新支付</div>
+    </van-dialog>
     <van-dialog v-model:show="Recharge.showTweetModal" :title="Recharge.tweet.name">
       <div v-html="Recharge.tweet.agreeContent" class="qh-html"></div>
     </van-dialog>
   </van-config-provider>
 </template>
-<script setup lang="ts">
-  import { type ConfigProviderThemeVars } from 'vant';
+<script setup lang="tsx">
+  import { type ConfigProviderThemeVars, showDialog, showToast } from 'vant';
   import { http, http2 } from '@/util/http';
   import { catchError, debounceTime, map, of, Subject, switchMap } from 'rxjs';
 
-  import { addPayOrder, ChannelEnum, type RechangeItem, type SysUser, TweetMark, TypeEnum } from './index.service';
-  import { showPayDialog } from '@/components/pay-dialog';
+  import { addPayOrder, ChannelEnum, getOrderInfo, type RechangeItem, type SysUser, TweetMark, TypeEnum } from './index.service';
+  import { type PayDialogResult, showPayDialog } from '@/components/pay-choose-dialog';
+  import { forwardWxPay } from '@/views/pay';
+  import { globalLoading } from '@/hooks/use-loading';
+  import { NumberUtil } from '@/util/utils';
 
   const white = '#fff';
   const themeVars: ConfigProviderThemeVars = {
@@ -115,6 +128,7 @@
     selectItem(item: RechangeItem) {
       Recharge.selected = item;
       Recharge.custom = null;
+      Recharge.customInput = null;
     },
     onPhoneClear() {
       Recharge.user = null;
@@ -142,7 +156,7 @@
     async onConfirmClick() {
       const amount = getAmount();
       if (amount) {
-        showPayDialog({
+        Pay.payDialogResult = showPayDialog({
           money: amount.amount,
           hamount: amount.tranHAmount,
           onOk(v) {
@@ -162,7 +176,7 @@
     const { custom, selected } = Recharge;
     if (custom) {
       const percent = Recharge.customRechangeItem?.percent ?? 1;
-      return { amount: `${custom}`, tranHAmount: percent * custom! };
+      return { amount: `${custom}`, tranHAmount: NumberUtil.multiply(percent, custom!) };
     }
 
     if (selected) {
@@ -173,6 +187,9 @@
   }
 
   const Pay = reactive({
+    showPayConfirm: false,
+    orderNo: '',
+    payDialogResult: null as any as PayDialogResult,
     // 支付类型 1:微信支付;2.支付宝支付
     async onOk(payType: 1 | 2) {
       if (!Recharge.user) {
@@ -184,6 +201,11 @@
         return false;
       }
 
+      if (payType === 2) {
+        $message('支付宝支付暂未开放，请使用微信支付');
+        return false;
+      }
+
       const { orderInfo, orderNo } = await addPayOrder({
         payChannel: ChannelEnum.H5,
         payNumber: TypeEnum.WM,
@@ -192,18 +214,31 @@
         ...amount!
       });
 
-      if (payType === 2) {
-        $message('支付宝支付暂未开放，请使用微信支付');
-      } else {
-        const { h5_url } = typeof orderInfo === 'string' ? JSON.parse(orderInfo) : orderInfo;
-        if (!h5_url) {
-          $message('未获取到支付地址，请重试');
-          return false;
-        }
+      Pay.orderNo = orderNo;
 
-        const redirect_url = encodeURIComponent(location.origin + location.pathname + '#/pay-result');
-        window.location.href = `${h5_url}&redirect_url=${redirect_url}`;
-        return true;
+      const { h5_url } = typeof orderInfo === 'string' ? JSON.parse(orderInfo) : orderInfo;
+      if (!h5_url) {
+        $message('获取支付信息失败，请重试');
+        return false;
+      }
+      const redirect_url = encodeURIComponent(location.origin + location.pathname + '#/pay-result');
+      const wxUrl = `${h5_url}&redirect_url=${redirect_url}`;
+      globalLoading.startLoading();
+      await forwardWxPay(wxUrl);
+      Pay.showPayConfirm = true;
+      globalLoading.endLoading();
+      return false;
+    },
+
+    async onPayOkClick() {
+      const info = await getOrderInfo(Pay.orderNo);
+      console.log(info);
+      if (info.status === 2) {
+        showToast('订单支付成功');
+        Pay.showPayConfirm = false;
+        Pay.payDialogResult.close();
+      } else {
+        showToast('订单支付失败，如有疑问请联系客服');
       }
     }
   });
@@ -235,7 +270,11 @@
           realList.push(item);
         }
         if (item.defaultFlag === 0) {
-          Recharge.customRechangeItem = item;
+          if (!item.cashAmount) {
+            Recharge.customRechangeItem = item;
+          } else {
+            item.hamount = NumberUtil.multiply(item.cashAmount, item.percent);
+          }
         }
       }
       Recharge.list = realList;
@@ -375,5 +414,22 @@
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 10px;
+  }
+
+  .pay-confirm-ok {
+    color: #de3554;
+    line-height: 42px;
+    height: 42px;
+    font-size: 20px;
+    text-align: center;
+    border-top: 1px solid #dee0e1;
+    border-bottom: 1px solid #dee0e1;
+  }
+  .pay-confirm-retry {
+    color: #707273;
+    line-height: 44px;
+    height: 44px;
+    font-size: 18px;
+    text-align: center;
   }
 </style>

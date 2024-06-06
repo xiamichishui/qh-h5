@@ -1,74 +1,75 @@
 <template>
   <van-config-provider :theme-vars="themeVars" class="flex-vertical page-container">
     <van-nav-bar title="H5充值" left-text="返回" left-arrow @click-left="onClickLeft" />
-    <div style="padding: 17px 17px 0">
-      <div class="account-input">
-        <label for="phone" class="phone-label">
-          {{ Recharge.user?.phone || '请输入氢次元账号或手机号' }}
-        </label>
+    <div style="padding: 17px 17px 0; flex: 1" class="flex-vertical">
+      <div class="flex-main">
+        <div class="account-input">
+          <label for="phone" class="phone-label">
+            {{ Recharge.user?.phone || '请输入氢次元账号或手机号' }}
+          </label>
 
-        <van-field v-if="Recharge.user" readonly :modelValue="Recharge.user?.username" class="phone-input">
-          <template #right-icon><van-icon name="clear" @click="Recharge.onPhoneClear" /></template>
-        </van-field>
+          <van-field v-if="Recharge.user" readonly :modelValue="Recharge.user?.username" class="phone-input">
+            <template #right-icon><van-icon name="clear" @click="Recharge.onPhoneClear" /></template>
+          </van-field>
 
-        <van-field
-          v-if="!Recharge.user"
-          id="phone"
-          v-model="Recharge.phone"
-          type="text"
-          clearable
-          class="phone-input"
-          @update:model-value="Recharge.onPhoneChange"
-        />
-        <van-field v-show="false"></van-field>
-      </div>
+          <van-field
+            v-if="!Recharge.user"
+            id="phone"
+            v-model="Recharge.phone"
+            type="text"
+            clearable
+            class="phone-input"
+            @update:model-value="Recharge.onPhoneChange"
+          />
+          <van-field v-show="false"></van-field>
+        </div>
 
-      <div class="amount-hint margin-v">请选择充值金额</div>
+        <div class="amount-hint margin-v">请选择充值金额</div>
 
-      <div class="list-box margin-v">
-        <div
-          class="list-item flex-center-middle"
-          :class="{ checked: item == Recharge.selected }"
-          v-for="item in Recharge.list"
-          :key="item.id"
-          @click="item.cashAmount && Recharge.selectItem(item)"
-        >
-          <div v-if="item.cashAmount">
-            <div class="checkbox-div">
-              <van-icon name="success" size="18" />
-            </div>
-            <div class="text-center">
-              <img src="@/assets/images/amount.svg" alt="" />
-              <div class="amount">￥{{ item.cashAmount }}</div>
-              <div class="hamount">{{ item.hamount }}mL氢气</div>
+        <div class="list-box margin-v">
+          <div
+            class="list-item flex-center-middle"
+            :class="{ checked: item == Recharge.selected }"
+            v-for="item in Recharge.list"
+            :key="item.id"
+            @click="item.cashAmount && Recharge.selectItem(item)"
+          >
+            <div v-if="item.cashAmount">
+              <div class="checkbox-div">
+                <van-icon name="success" size="18" />
+              </div>
+              <div class="text-center">
+                <img src="@/assets/images/amount.svg" alt="" />
+                <div class="amount">￥{{ item.cashAmount }}</div>
+                <div class="hamount">{{ item.hamount }}mL氢气</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="custom-amount margin-v flex-horizontal">
-        <div class="custom-prefix flex-middle flex-end">￥</div>
-        <van-field
-          v-model="Recharge.customInput"
-          style="background: transparent; padding-left: 5px"
-          class="flex-main"
-          type="number"
-          clearable
-          placeholder="自定义充值金额（必须为100的整数倍）"
-          @focus="Recharge.selected = null"
-          @blur="Recharge.onCustomBlur"
-          @update:modelValue="Recharge.onCustomChange"
-        />
-      </div>
+        <div class="custom-amount margin-v flex-horizontal">
+          <div class="custom-prefix flex-middle flex-end">￥</div>
+          <van-field
+            v-model="Recharge.customInput"
+            style="background: transparent; padding-left: 5px"
+            class="flex-main"
+            type="number"
+            clearable
+            placeholder="自定义充值金额（必须为100的整数倍）"
+            @focus="Recharge.selected = null"
+            @blur="Recharge.onCustomBlur"
+            @update:modelValue="Recharge.onCustomChange"
+          />
+        </div>
 
-      <div class="user-protocol margin-v">
-        <van-checkbox v-model="Recharge.checked">我已阅读并同意</van-checkbox>
-        <a @click="Recharge.onShowModal(TweetMark.user_agree)">《服务协议》</a>
-        和
-        <a @click="Recharge.onShowModal(TweetMark.privacy)">《隐私政策》</a>
+        <div class="user-protocol margin-v">
+          <van-checkbox v-model="Recharge.checked">我已阅读并同意</van-checkbox>
+          <a @click="Recharge.onShowModal(TweetMark.user_agree)">《服务协议》</a>
+          和
+          <a @click="Recharge.onShowModal(TweetMark.privacy)">《隐私政策》</a>
+        </div>
       </div>
-
-      <van-button style="margin-top: 58px" round type="primary" block :disabled="isDisabled" @click="Recharge.onConfirmClick">
+      <van-button round type="primary" style="margin-bottom: 15px" block :disabled="isDisabled" @click="Recharge.onConfirmClick">
         确定充值
       </van-button>
     </div>
@@ -93,7 +94,16 @@
   import { http, http2 } from '@/util/http';
   import { catchError, debounceTime, map, of, Subject, switchMap } from 'rxjs';
 
-  import { addPayOrder, ChannelEnum, getOrderInfo, type RechangeItem, type SysUser, TweetMark, TypeEnum } from './index.service';
+  import {
+    addPayOrder,
+    ChannelEnum,
+    getOrderInfo,
+    OderStatus,
+    type RechangeItem,
+    type SysUser,
+    TweetMark,
+    TypeEnum
+  } from './index.service';
   import { closePayDialog, showPayDialog } from '@/components/pay-choose-dialog';
   import { forwardWxPay } from '@/views/pay';
   import { globalLoading } from '@/hooks/use-loading';
@@ -220,19 +230,20 @@
         $message('获取支付信息失败，请重试');
         return false;
       }
-      const redirect_url = encodeURIComponent(location.origin + location.pathname + '#/pay-result');
-      const wxUrl = `${h5_url}&redirect_url=${redirect_url}`;
       globalLoading.startLoading();
-      await forwardWxPay(wxUrl);
+      await forwardWxPay(h5_url);
       Pay.showPayConfirm = true;
       globalLoading.endLoading();
       return false;
     },
 
     async onPayOkClick() {
-      const info = await getOrderInfo(Pay.orderNo);
-      console.log(info);
-      if (info.status === 2) {
+      const status = await getOrderInfo(Pay.orderNo);
+      if (!status) {
+        showToast('订单支付失败，订单不存在');
+        return;
+      }
+      if (status === OderStatus.PAY_YES) {
         showToast('订单支付成功');
         Pay.showPayConfirm = false;
         closePayDialog();
@@ -276,6 +287,7 @@
           }
         }
       }
+
       Recharge.list = realList;
       Recharge.selected = Recharge.list[1];
     });

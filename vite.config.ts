@@ -19,6 +19,7 @@ export default defineConfig(env => {
     envPrefix: 'YYX_',
     root,
     server: {
+      host: '0.0.0.0',
       port: +envConfig.YYX_PORT,
       proxy: {
         '/api': {

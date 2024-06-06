@@ -8,14 +8,30 @@ export function addPayOrder(req: PayOrderReq) {
  * 查询订单状态
  * @param orderNo 订单号
  */
-export async function getOrderInfo(orderNo: string) {
-  const [order] = await http.post<OderInfoResp[]>('/order/page', {
-    page: {
-      pageIndex: 1,
-      pageSize: 1
-    }
-  });
-  return order;
+export function getOrderInfo(orderNo: string) {
+  return http.get<OderInfoStatus>(`/order/getPayOrderStatus/${orderNo}`);
+}
+
+export type OderInfoStatus = OderStatus | null;
+
+// 状态 1:未支付;2.已支付;3.支付关闭;4.支付失败
+export enum OderStatus {
+  /**
+   * 未支付
+   */
+  PAY_NO = 1,
+  /**
+   * 已支付
+   */
+  PAY_YES = 2,
+  /**
+   * 支付关闭
+   */
+  PAY_CLOSE = 3,
+  /**
+   * 支付失败
+   */
+  PAY_FAIL = 4
 }
 
 /**

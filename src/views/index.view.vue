@@ -105,9 +105,9 @@
     TypeEnum
   } from './index.service';
   import { closePayDialog, showPayDialog } from '@/components/pay-choose-dialog';
-  import { forwardWxPay } from '@/views/pay';
+  import { forwardPay } from '@/views/pay';
   import { globalLoading } from '@/hooks/use-loading';
-  import { NumberUtil } from '@/util/utils';
+  import { isMobile, NumberUtil } from '@/util/utils';
 
   const white = '#fff';
   const themeVars: ConfigProviderThemeVars = {
@@ -210,8 +210,8 @@
         return false;
       }
 
-      if (payType === 2) {
-        $message('支付宝支付暂未开放，请使用微信支付');
+      if (!isMobile) {
+        $message('仅支持手机端支付');
         return false;
       }
 
@@ -225,13 +225,29 @@
 
       Pay.orderNo = orderNo;
 
-      const { h5_url } = typeof orderInfo === 'string' ? JSON.parse(orderInfo) : orderInfo;
-      if (!h5_url) {
-        $message('获取支付信息失败，请重试');
+      let url: string;
+      // 支付宝
+      if (payType === 2) {
+        // alipay_sdk=alipay-sdk-java-4.39.79.ALL&app_id=2021003197631032&biz_content=%7B%22out_trade_no%22%3A%22HYHE_ORDER_20240612204816221876%22%2C%22product_code%22%3A%22QUICK_MSECURITY_PAY%22%2C%22subject%22%3A%22%E6%B0%A2%E6%B0%94%E5%85%85%E5%80%BC%22%2C%22total_amount%22%3A%226%22%7D&charset=UTF-8&format=json&method=alipay.trade.app.pay&notify_url=http%3A%2F%2F39.105.13.19%3A8011%2Forder%2FaliPayNotify&return_url=https%3A%2F%2Fwww.baidu.com&sign=eK1M%2BwQ%2B8STDM%2BNnlOlbgod64UDimHN3LCrAMHNd47eQc9NRkTVpxc2h6EzHNC80xVc8z%2F9XZEH24%2FkhgRJ7hcatmQGOArWIA0UScxsGsleAKeqTG22yJIc8uqcNBceerVWlGdhEYq%2BNNBtplPgt8j7d9iWRzDy%2BSUKl%2BW81e5mjOSqQyznhpXp9xa2BypELP3mU6yxcbJS%2BJ7CDHdMuY%2BGFnnjfAq56l6thegkFHd3BPlZ4gwOF6Hpvoo%2FoYksqq3xUJN87Qw%2BJ5egfpOt3i59KVv5Zq8itHJamTambMMeLjJ42nvKh4420PbnjLNbwcfRexfxLiUPe7ymzasW0UQ%3D%3D&sign_type=RSA2&timestamp=2024-06-12+20%3A48%3A16&version=1.0
+        url = `https://openapi.alipay.com/gateway.do?${orderInfo}`;
+      } else {
+        // {"h5_url":"https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=wx12210621100303b5a492c42e54695a0001&package=2778671236"}
+        const { h5_url } = typeof orderInfo === 'string' ? JSON.parse(orderInfo) : orderInfo;
+        if (!h5_url) {
+          $message('获取支付信息失败，请重试');
+          return false;
+        }
+        url = h5_url;
+      }
+
+      globalLoading.startLoading();
+      try {
+        await forwardPay(url);
+      } catch (e) {
+        $message('订单支付失败，设备不支持');
+        globalLoading.endLoading();
         return false;
       }
-      globalLoading.startLoading();
-      await forwardWxPay(h5_url);
       Pay.showPayConfirm = true;
       globalLoading.endLoading();
       return false;

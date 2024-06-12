@@ -64,3 +64,6 @@ class NumberUtilClass {
 }
 
 export const NumberUtil = new NumberUtilClass(10000);
+
+const ua = navigator.userAgent.toLowerCase();
+export const isMobile = /ios|iphone|ipod|ipad|android/.test(ua);

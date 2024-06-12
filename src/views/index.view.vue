@@ -76,7 +76,7 @@
 
     <van-dialog
       v-model:show="Pay.showPayConfirm"
-      title="请确认微信支付是否完成"
+      :title="Pay.payTitle"
       :show-cancel-button="false"
       :show-confirm-button="false"
       class-name="pay-result-dialog"
@@ -198,9 +198,13 @@
 
   const Pay = reactive({
     showPayConfirm: false,
+    payTitle: '',
     orderNo: '',
     // 支付类型 1:微信支付;2.支付宝支付
     async onOk(payType: 1 | 2) {
+      const title = { 1: '微信', 2: '支付宝' }[payType];
+      Pay.payTitle = `请确认${title}支付是否完成`;
+
       if (!Recharge.user) {
         return false;
       }

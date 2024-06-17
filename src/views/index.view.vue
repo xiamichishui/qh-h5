@@ -99,6 +99,7 @@
     ChannelEnum,
     getOrderInfo,
     OderStatus,
+    PayNumberEnum,
     type RechangeItem,
     type SysUser,
     TweetMark,
@@ -221,7 +222,7 @@
 
       const { orderInfo, orderNo } = await addPayOrder({
         payChannel: ChannelEnum.H5,
-        payNumber: TypeEnum.WM,
+        payNumber: PayNumberEnum.WM,
         payType,
         userId: Recharge.user.id,
         ...amount!

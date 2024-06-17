@@ -139,6 +139,21 @@ export enum ChannelEnum {
 
 export enum TypeEnum {
   /**
+   * 水分子兑换现金
+   */
+  MQ = 2,
+  /**
+   * 水分子兑换氢气
+   */
+  WQ = 1,
+  /**
+   * 现金兑换氢气
+   */
+  WM = 0
+}
+
+export enum PayNumberEnum {
+  /**
    * 会员支付
    */
   MQ = 0,

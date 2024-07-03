@@ -34,7 +34,7 @@
         <div class="text-center" style="color: #333; font-size: 20px; margin-top: 40px">
           <span>￥</span>
           <span style="font-size: 40px; font-weight: 500">{{ props.money }}</span>
-          <div v-if="props.hamount" class="hamount">{{ props.hamount }}mL氢气</div>
+          <div v-if="props.hamount" class="hamount">{{ props.hamount }}L氢气</div>
         </div>
       </div>
     </div>

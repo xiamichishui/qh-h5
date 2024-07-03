@@ -41,7 +41,7 @@
               <div class="text-center">
                 <img src="@/assets/images/amount.svg" alt="" />
                 <div class="amount">￥{{ item.cashAmount }}</div>
-                <div class="hamount">{{ item.hamount }}mL氢气</div>
+                <div class="hamount">{{ item.hamount }}L氢气</div>
               </div>
             </div>
           </div>
